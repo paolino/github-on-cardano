@@ -32,7 +32,7 @@ let
   in {
     inherit project;
     github-on-cardano = components.exes.github-on-cardano;
-    github-on-cardano-tests = components.tests.github-on-cardano-test;
+    github-on-cardano-tests = components.tests.github-on-cardano-tests;
   };
 in {
   inherit packages;

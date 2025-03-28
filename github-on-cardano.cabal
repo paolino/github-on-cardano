@@ -80,7 +80,7 @@ executable github-on-cardano
     -- Base language which the package is written in.
     default-language: Haskell2010
 
-test-suite github-on-cardano-test
+test-suite github-on-cardano-tests
     type:             exitcode-stdio-1.0
 
     import:           warnings

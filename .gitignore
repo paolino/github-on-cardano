@@ -1,0 +1,5 @@
+.vscode
+.direnv
+dist-newstyle
+github-on-cardano-exe-*
+result

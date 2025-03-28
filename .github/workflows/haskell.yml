@@ -3,7 +3,6 @@ name: Haskell CI
 env:
   VERSION: "0.1.0.0"
   CACHIX_REPO: paolino
-  REPO: github-on-cardano
 on:
   pull_request:
   push:
@@ -17,13 +16,12 @@ jobs:
         github_access_token: ${{ secrets.GITHUB_TOKEN }}
     - uses: cachix/cachix-action@v14
       with:
-        name: $CACHIX_REPO
+        name: ${{ env.CACHIX_REPO }}
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - name: Run tests
       run: |
-        cd haskell
-        nix build .#${{repo}}-tests
-        ./result/bin/${{repo}}-tests
+        nix build .#github-on-cardano-tests
+        ./result/bin/github-on-cardano-tests
   builds:
     runs-on: ubuntu-latest
     steps:
@@ -33,13 +31,12 @@ jobs:
         github_access_token: ${{ secrets.GITHUB_TOKEN }}
     - uses: cachix/cachix-action@v14
       with:
-        name: $CACHIX_REPO
+        name: ${{ env.CACHIX_REPO }}
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
 
-    - name: Build ${{repo}}
+    - name: Build
       run: |
-        cd haskell
-        nix build .#${{repo}}
+        nix build .#github-on-cardano
 
   bundles:
     runs-on: ubuntu-latest
@@ -50,18 +47,29 @@ jobs:
         github_access_token: ${{ secrets.GITHUB_TOKEN }}
     - uses: cachix/cachix-action@v14
       with:
-        name: $CACHIX_REPO
+        name: ${{ env.CACHIX_REPO }}
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
 
-    - name: Bundle ${{repo}}
+    - name: Bundle github-on-cardano
       run: |
-        cd haskell
-        nix bundle .#${{repo}}
-        cp -L logins-exe-${{repo}}-arx ${{repo}}
-        rm logins-exe-${{repo}}-arx
-    - name: Archive ${{repo}}
+        nix bundle .#github-on-cardano
+        cp -L github-on-cardano-exe-github-on-cardano-arx github-on-cardano
+        rm github-on-cardano-exe-github-on-cardano-arx
+    - name: Archive github-on-cardano
       uses: actions/upload-artifact@v4
       with:
-        name: ${{repo}}
+        name: github-on-cardano
         path: |
-          haskell/${{repo}}
+          ./github-on-cardano
+    - name: Bundle github-on-cardano docker-image
+      run: |
+            nix bundle --bundler github:NixOS/bundlers#toDockerImage .#github-on-cardano
+            cp -L ./github-on-cardano-exe-github-on-cardano-${{ env.VERSION }}.tar.gz \
+              ./github-on-cardano-docker-image.tar.gz
+            rm ./github-on-cardano-exe-github-on-cardano-${{ env.VERSION }}.tar.gz
+    - name: Archive github-on-cardano docker-image
+      uses: actions/upload-artifact@v4
+      with:
+        name: github-on-cardano-docker-image
+        path: |
+          ./github-on-cardano-docker-image.tar.gz
